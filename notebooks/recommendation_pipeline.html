@@ -16032,7 +16032,7 @@ The 3 most similar users to user 46 are: [4201, 3782, 23]
 <span class="sd">     </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="c1"># Column names</span>
-    <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;neighbor_id&#39;</span><span class="p">,</span> <span class="s1">&#39;similarity&#39;</span><span class="p">,</span> <span class="s1">&#39;num_interactions&#39;</span><span class="p">]</span> 
+    <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;neighbor_id&#39;</span><span class="p">,</span> <span class="s1">&#39;similarity&#39;</span><span class="p">]</span> 
 
     <span class="c1"># initialise the table</span>
     <span class="n">neighbors_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">)</span>
@@ -16040,7 +16040,13 @@ The 3 most similar users to user 46 are: [4201, 3782, 23]
     <span class="c1"># fill it</span>
     <span class="n">neighbors_df</span><span class="p">[</span><span class="s1">&#39;neighbor_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_item</span><span class="o">.</span><span class="n">index</span>
     <span class="n">neighbors_df</span><span class="p">[</span><span class="s1">&#39;similarity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_item</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">user_item</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">user_id</span><span class="p">])</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">neighbors_df</span><span class="p">[</span><span class="s1">&#39;num_interactions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">user_id</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+
+    <span class="c1"># add interactions</span>
+    <span class="n">interactions</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">interactions</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;index&#39;</span><span class="p">:</span><span class="s1">&#39;neighbor_id&#39;</span><span class="p">,</span> <span class="s1">&#39;user_id&#39;</span><span class="p">:</span><span class="s1">&#39;num_interactions&#39;</span><span class="p">},</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">interactions</span>
+
+    <span class="n">neighbors_df</span> <span class="o">=</span> <span class="n">neighbors_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">interactions</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span> <span class="s1">&#39;neighbor_id&#39;</span><span class="p">)</span>
 
     <span class="c1"># remove itself</span>
     <span class="n">neighbors_df</span> <span class="o">=</span> <span class="n">neighbors_df</span><span class="p">[</span><span class="n">neighbors_df</span><span class="p">[</span><span class="s1">&#39;neighbor_id&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">user_id</span><span class="p">]</span>
@@ -16086,7 +16092,12 @@ The 3 most similar users to user 46 are: [4201, 3782, 23]
     
     <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">top_similar_users</span><span class="p">:</span>
         <span class="n">similar_article_ids</span><span class="p">,</span> <span class="n">similar_article_names</span> <span class="o">=</span> <span class="n">get_user_articles</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
-        <span class="n">recommendations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">similar_article_ids</span><span class="p">,</span> <span class="n">viewed_article_ids</span><span class="p">,</span> <span class="n">assume_unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">recommendations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">similar_article_ids</span><span class="p">,</span> <span class="n">viewed_article_ids</span><span class="p">,</span> <span class="n">assume_unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="c1"># sort according to interactions</span>
+        <span class="n">recommendations</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;article_id&#39;</span><span class="p">)[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()[</span><span class="n">recommendations</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
         <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">recommendations</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">m</span><span class="p">:</span>
                 <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
@@ -16138,10 +16149,10 @@ The 3 most similar users to user 46 are: [4201, 3782, 23]
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>The top 10 recommendations for user 20 are the following article ids:
-[&#39;1014.0&#39;, &#39;1059.0&#39;, &#39;109.0&#39;, &#39;111.0&#39;, &#39;1157.0&#39;, &#39;1162.0&#39;, &#39;1164.0&#39;, &#39;1172.0&#39;, &#39;1186.0&#39;, &#39;12.0&#39;]
+[&#39;1330.0&#39;, &#39;1427.0&#39;, &#39;1364.0&#39;, &#39;1170.0&#39;, &#39;1162.0&#39;, &#39;1304.0&#39;, &#39;1351.0&#39;, &#39;1160.0&#39;, &#39;1354.0&#39;, &#39;1368.0&#39;]
 
 The top 10 recommendations for user 20 are the following article names:
-[&#39;timeseries data analysis of iot events by using jupyter notebook&#39;, &#39;analyze energy consumption in buildings&#39;, &#39;analyze open data sets with pandas dataframes&#39;, &#39;apache spark lab, part 3: machine learning&#39;, &#39;airbnb data for analytics: washington d.c. listings&#39;, &#39;airbnb data for analytics: amsterdam calendar&#39;, &#39;tidy up your jupyter notebooks with scripts&#39;, &#39;tensorflow quick tips&#39;, &#39;1448    i ranked every intro to data science course on...\r\nName: title, dtype: object&#39;, &#39;connect to db2 warehouse on cloud and db2 using scala&#39;]
+[&#39;apache spark lab, part 1: basic concepts&#39;, &#39;predicting churn with the spss random tree algorithm&#39;, &#39;analyze energy consumption in buildings&#39;, &#39;use xgboost, scikit-learn &amp; ibm watson machine learning apis&#39;, &#39;putting a human face on machine learning&#39;, &#39;gosales transactions for logistic regression model&#39;, &#39;insights from new york car accident reports&#39;, &#39;model bike sharing data with spss&#39;, &#39;analyze accident reports on amazon emr spark&#39;, &#39;movie recommender system with spark machine learning&#39;]
 </pre>
 </div>
 </div>
@@ -16195,10 +16206,134 @@ The top 10 recommendations for user 20 are the following article names:
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>The user that is most similar to user 1 is 3933.0
-The 10th user that is most similar to user 131 is 242.0
+<pre>The user that is most similar to user 1 is 3933
+The 10th user that is most similar to user 131 is 242
 </pre>
 </div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_top_sorted_users</span><span class="p">(</span><span class="mi">131</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[&nbsp;]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>neighbor_id</th>
+      <th>similarity</th>
+      <th>num_interactions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3869</th>
+      <td>3870</td>
+      <td>74</td>
+      <td>144</td>
+    </tr>
+    <tr>
+      <th>3781</th>
+      <td>3782</td>
+      <td>39</td>
+      <td>363</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>23</td>
+      <td>38</td>
+      <td>364</td>
+    </tr>
+    <tr>
+      <th>202</th>
+      <td>203</td>
+      <td>33</td>
+      <td>160</td>
+    </tr>
+    <tr>
+      <th>4458</th>
+      <td>4459</td>
+      <td>33</td>
+      <td>158</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>98</td>
+      <td>29</td>
+      <td>170</td>
+    </tr>
+    <tr>
+      <th>3763</th>
+      <td>3764</td>
+      <td>29</td>
+      <td>169</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>49</td>
+      <td>29</td>
+      <td>147</td>
+    </tr>
+    <tr>
+      <th>3696</th>
+      <td>3697</td>
+      <td>29</td>
+      <td>145</td>
+    </tr>
+    <tr>
+      <th>241</th>
+      <td>242</td>
+      <td>25</td>
+      <td>148</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
 </div>
 
 </div>
