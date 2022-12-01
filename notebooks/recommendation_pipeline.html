@@ -17334,12 +17334,14 @@ class="
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>From the plot above, we see:</p>
+<p><strong>From the plot above, we see that the accuracy increases on the train sample but decreases on the test sample. This could be because of the imbalance of the data as only 20 out of &gt;4000 users in the train set are in the test set also. The model may be overfitting on train... Or because of the imbalance, the accuracy is just not a good metric to use. The fact that it's &gt;96% is way too high. It is not good enough to make conclusive results about our model and our data.</strong></p>
+<p><strong>The possible improvements could be:</strong></p>
 <ol>
-<li>The train trend is increasing while the test one is decreasing.</li>
-<li>We could use a recommendation engine to help with the cold start problem</li>
+<li>Change the metric to weighted metric of F-score.</li>
+<li>Combine contend based recommendation with some other recommendation method - or more ML methods in general. We could do some NLP on the titles to group the titles in more categories.</li>
+<li>We could use a rank-based recommendation to filter our user-user based one.</li>
+<li>We could carry out A/B testing (online testing) to get feedback from users while testing 2 models</li>
 </ol>
-<p>This is because our more latent features will just act as a noise and result in poor accuracy. It seems like 200 latent features best describe the variability of the dataset and best suited for building recommendations.</p>
 
 </div>
 </div>
