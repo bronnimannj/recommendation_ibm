@@ -1,11 +1,14 @@
-# recommendation_ibm
+# Recommendation model on IBM data
 
 ## Table of contents
 
 - [Motivations](#motivations)
 - [Packages used](#packages_used)
+- [Instructions](#instructions)
 - [Files](#files)
 - [Analysis workflow](#analysis_workflow)
+- [License](#license)
+- [Status](#status)
 
 ## Motivations <a name="motivations"></a>
 
@@ -25,6 +28,16 @@ In this project, I am creating a recommendation engine with Watson Studio Data f
 - pathlib
 - os
 - sys
+
+## Instructions <a name="instructions"></a>
+
+How to install and run the project
+
+You can clone this repository by opening Git Bash and the command line
+
+```text
+git clone https://github.com/jmballard/recommendation_ibm.git
+```
 
 ## Files <a name="files"></a>
 
@@ -83,3 +96,32 @@ Given the amount of content available for each article, there are a number of di
 ### Matrix factorization engine
 
 Matrix decomposition is used to predict new articles an individual might interact with.
+
+
+## License <a name="license"></a>
+
+MIT License
+
+Copyright (c) [2022] [Julie Ballard]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## Project status  <a name="status"></a>
+
+This project is finished
